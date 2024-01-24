@@ -98,6 +98,8 @@ namespace ITI.HerosGymManagementSystemConsoleApp
                     Environment.Exit(0);
                     break;
                 default:
+                    Console.WriteLine("Enter a valid option!!");
+                    GetUserTravelOnApp(connection, UserId);
                     break;
 
             }

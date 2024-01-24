@@ -17,7 +17,7 @@ namespace ITI.HerosGymManagementSystemConsoleApp
 
 
             string query = "SELECT 1 FROM Members m " +
-                           "INNER JOIN Member_Phones mp ON m.Id = mp.Member_Id " +
+                           "INNER JOIN Member_Phones mp ON m.Id = mp.Id " +
                            "WHERE mp.Phone = @PhoneNumber";
 
             SqlCommand cmd = new SqlCommand(query, connection);
@@ -107,7 +107,7 @@ namespace ITI.HerosGymManagementSystemConsoleApp
 
             while (true)
             {
-                Console.Write("Enter Member Name  correct to move to next step: ");
+                Console.Write("Enter Member Name correct to move to next step: ");
                 name = Console.ReadLine();
                 if (Helper.IsValidName(name)) break;
 
@@ -166,7 +166,7 @@ namespace ITI.HerosGymManagementSystemConsoleApp
         {
             try
             {
-                string insertQuery = "INSERT INTO Members (Name, Email, Age, Gender, User_Id, Membership_Id) " +
+                string insertQuery = "INSERT INTO Members (Name, Email, Age, Gender, User_Id, Id) " +
                                      "VALUES (@Name, @Email, @Age, @Gender, @User_Id, @Membership_Id); " +
                                      "SELECT SCOPE_IDENTITY();";
 

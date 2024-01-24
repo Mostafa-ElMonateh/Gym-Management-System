@@ -13,8 +13,6 @@ namespace ITI.HerosGymManagementSystemConsoleApp
 {
     internal static class MemberShip
     {
-        private static bool HeaderFlag = false;
-
         #region File Updates
 
         private static string filePath = "membership_updates.txt";
@@ -25,15 +23,11 @@ namespace ITI.HerosGymManagementSystemConsoleApp
             {
                 using (StreamWriter writer = new StreamWriter(filePath, true))
                 {
-                    if (HeaderFlag is false)
-                    {
-                        writer.WriteLine("|   Status   |    Name    | Amount |  Period   |        DateTime       |    User    |");
-                        writer.WriteLine("|------------|------------|--------|-----------|-----------------------|------------|");
-                        HeaderFlag = true;
-                    }
-                    writer.WriteLine($"| {"Old", -10} | {Old.Name, -10} | {Old.Amount,-6} | {Old.Period, -9} | {"", -21} | {"",-10} |");
-                    writer.WriteLine($"| {"Updated",-10} | {Updated.Name,-10} | {Updated.Amount,-6} | {Updated.Period,-9} | {DateTime.Now,-21} | {UserName,-10} |");
-                    writer.WriteLine("+------------+------------+--------+-----------+-----------------------+------------+");
+                    writer.WriteLine("-- OLD --");
+                    writer.WriteLine($"Name = {Old.Name}\nAmount = {Old.Amount}\nPeriod = {Old.Period}");
+                    writer.WriteLine("-- UPDATED --");
+                    writer.WriteLine($"Name = {Updated.Name}\nAmount = {Updated.Amount}\nPeriod = {Updated.Period}\nDateTime Of Modification = {DateTime.Now}\nUser Modified = {UserName}");
+                    writer.WriteLine("--------------------------------------------------------");
                 }
             }
             catch (Exception ex)
@@ -166,11 +160,8 @@ namespace ITI.HerosGymManagementSystemConsoleApp
                 return;
             }
 
-            do
-            {
-                Console.Write("Enter the new Name: ");
-                name = Console.ReadLine();
-            } while (name is null | name == "");
+            // Asking For the new Name..
+            CheckForMemberShipName(connection);
 
             do
             {
@@ -312,6 +303,38 @@ namespace ITI.HerosGymManagementSystemConsoleApp
                         return new RecordMemberShipUpdates(reader.GetString(0), reader.GetInt32(1), reader.GetInt32(2));
             }
             return null;
+        }
+        public static void CheckForMemberShipName(SqlConnection connection)
+        {
+            bool NameFlag = false;
+            string? NewName;
+            do
+            {
+                Console.Write("Enter the new Name: ");
+                NewName = Console.ReadLine();
+                SqlCommand command = new SqlCommand($"select name from memberships",connection);
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            if (NewName.ToLower() == name.ToLower())
+                            {
+                                name = NewName;
+                                return;
+                            }
+                            else if (NewName.ToLower() == reader[0].ToString().ToLower())
+                            {
+                                NameFlag = true;
+                                Console.WriteLine("There is already a membership with this name!!");
+                            }
+                            else
+                                NameFlag = false;
+                        }
+                    }
+                }
+            } while (name is null | name == "" | NameFlag == true);
         }
 
 
