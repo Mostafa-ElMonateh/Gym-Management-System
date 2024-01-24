@@ -55,7 +55,7 @@ Some Of User Accounts:
     - Allows the user to update information for a specific coach.
 - *Delete a Coach:*
     - Enables the user to delete a coach from the system.
-    - - * Get All Coachs:*
+- * Get All Coachs:*
     - Displays a list of all active Coachs.
 
 **Memberships**
