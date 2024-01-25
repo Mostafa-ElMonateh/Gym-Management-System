@@ -192,7 +192,7 @@ namespace ITI.HerosGymManagementSystemConsoleApp
                 }
 
 
-                string updateQuery = "UPDATE Coaches SET IsDeleted = 'f' WHERE Id = @CoachId;";
+                string updateQuery = "UPDATE Coaches SET IsDeleted = 't' WHERE Id = @CoachId;";
                 SqlCommand cmd = new SqlCommand(updateQuery, connection);
                 cmd.Parameters.AddWithValue("@CoachId", coachId);
                 int result2 = cmd.ExecuteNonQuery();
