@@ -6,7 +6,7 @@ namespace ITI.HerosGymManagementSystemConsoleApp
     {
         #region Fields
         private readonly SqlConnection connection;
-        int UserId; 
+        int UserId;
         #endregion
 
         #region Methods
@@ -15,7 +15,7 @@ namespace ITI.HerosGymManagementSystemConsoleApp
         {
             this.connection = connection;
             UserId = _UserId;
-        } 
+        }
         #endregion
         public void ShowUserMenu()
         {
@@ -28,7 +28,7 @@ namespace ITI.HerosGymManagementSystemConsoleApp
                 Console.WriteLine("4. Delete Coach");
                 Console.WriteLine("5. Get All Coachs");
                 Console.WriteLine("6. Return");
-                Console.Write("Enter the number of your choice: ");
+                Console.Write("Enter  your choice: ");
                 string? choice = Console.ReadLine();
                 Console.Clear();
                 switch (choice)
@@ -62,17 +62,16 @@ namespace ITI.HerosGymManagementSystemConsoleApp
             /* Ask coach for his data 
              * [ Name - Email - Program id - Phone - Id-->(update) - Address ] 
              */
-            string? name;
+            string? name, phone;
             string? email;
-            int programId, userId, phone, coachId = 0;
+            int programId, userId = UserId, coachId = 0;
             if (Flag == 2)
             {
 
                 Console.Write("Enter Coach ID: ");
-                while (!int.TryParse(Console.ReadLine(), out coachId))
+                while (!int.TryParse(Console.ReadLine(), out coachId) || !(Helper.CoachIdExists(connection, coachId)))
                 {
                     Console.WriteLine("Invalid Coach ID. Enter a valid integer.");
-
                 }
 
             }
@@ -80,7 +79,10 @@ namespace ITI.HerosGymManagementSystemConsoleApp
             {
                 Console.Write("Enter Coach Name: ");
                 name = Console.ReadLine();
-                if (Helper.IsValidName(name)) break;
+                bool check = Helper.CoachNameExists(connection, name);
+                if (check) Console.WriteLine("this Coach  name is existed");
+                if (Helper.IsValidName(name) && !check)
+                    break;
 
             }
             while (true)
@@ -90,26 +92,26 @@ namespace ITI.HerosGymManagementSystemConsoleApp
                 if (Helper.IsValidEmail(email)) break;
             }
 
-            Console.Write("Enter Program ID: ");
 
-            while (!int.TryParse(Console.ReadLine(), out programId))
+
+            while (true)
             {
-                Console.WriteLine("Invalid Program ID. Enter a valid integer.");
+                GymProgram.GetAllPrograms(connection, userId);
+                Console.Write("Enter Program ID: ");
+                bool ok = int.TryParse(Console.ReadLine(), out programId);
+                bool exist = Helper.ProgramIdExists(connection, programId);
+                if (ok && exist)
+                    break;
 
             }
 
-            Console.Write("Enter User ID: ");
-            while (!int.TryParse(Console.ReadLine(), out userId))
+
+            while (true)
             {
-                Console.WriteLine("Invalid User ID. Enter a valid integer.");
-
-            }
-
-            Console.Write("Enter Coach Phone: ");
-            while (!int.TryParse(Console.ReadLine(), out phone))
-            {
-                Console.WriteLine("Invalid Phone number. Enter a valid integer.");
-
+                Console.Write("Enter Coach Phone: ");
+                phone = Console.ReadLine();
+                bool check = Helper.IsValidPhoneNumber(phone);
+                if (check) break;
             }
 
             Console.Write("Enter Coach Address: ");
@@ -126,7 +128,7 @@ namespace ITI.HerosGymManagementSystemConsoleApp
             }
 
         }
-        public void AddCoach(string name, string email, int programId, int userId, int phone, string address)
+        public void AddCoach(string name, string email, int programId, int userId, string phone, string address)
         {
 
 
@@ -169,7 +171,7 @@ namespace ITI.HerosGymManagementSystemConsoleApp
             {
                 Console.WriteLine($"Enter vaild id ");
             }
-            
+
             ShowUserMenu();
         }
         public void DeleteCoach()
@@ -178,10 +180,14 @@ namespace ITI.HerosGymManagementSystemConsoleApp
             try
             {
                 int coachId;
-                Console.Write("Enter Coach ID: ");
-                while (!int.TryParse(Console.ReadLine(), out coachId))
+
+                while (true)
                 {
-                    Console.WriteLine("Invalid Coach ID. Please enter a valid integer.");
+                    Console.Write("Enter Coach ID: ");
+                    bool check = int.TryParse(Console.ReadLine(), out coachId);
+                    bool ok = Helper.CoachIdExists(connection, coachId);
+                    if (ok && check) break;
+
 
                 }
 
@@ -199,7 +205,7 @@ namespace ITI.HerosGymManagementSystemConsoleApp
             {
                 Console.WriteLine($"Error: {e.Message}");
             }
-            Console.Clear();
+
             ShowUserMenu();
 
 
@@ -264,7 +270,7 @@ namespace ITI.HerosGymManagementSystemConsoleApp
 
 
         }
-        public void UpdateCoach(int coachId, string newName, string newEmail, int newProgramId, int newUserId, int newPhone, string newAddress)
+        public void UpdateCoach(int coachId, string newName, string newEmail, int newProgramId, int newUserId, string newPhone, string newAddress)
         {
             // Update coaches data by know its id  
             try
@@ -296,7 +302,7 @@ namespace ITI.HerosGymManagementSystemConsoleApp
             ShowUserMenu();
 
 
-        } 
+        }
         #endregion
     }
 }

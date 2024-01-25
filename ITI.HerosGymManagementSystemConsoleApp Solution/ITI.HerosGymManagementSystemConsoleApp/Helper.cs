@@ -189,24 +189,23 @@ namespace ITI.HerosGymManagementSystemConsoleApp
         {
             // Validate the phone number format based on your specific requirements
             // For example, you might want to check if it contains only digits and has a specific length
-
-            if (string.IsNullOrEmpty(phoneNumber))
+            if (phoneNumber.Length != 11)
             {
                 return false;
             }
+            string[] validPrefixes = { "010", "011", "012", "015" };
+            bool isValidPrefix = false;
 
-            foreach (char digit in phoneNumber)
+            foreach (string prefix in validPrefixes)
             {
-                if (!char.IsDigit(digit))
+                if (phoneNumber.StartsWith(prefix))
                 {
-                    return false;
+                    isValidPrefix = true;
+                    break;
                 }
             }
-
-            // Add more conditions as needed
-            // For example, you can check if it has a specific length
-
-            return true;
+            bool isValidFormat = Regex.IsMatch(phoneNumber, "^[0-9]+$");
+            return isValidPrefix && isValidFormat;
         }
         public static bool ValidateDates(DateTime startDate, DateTime endDate)
         {
@@ -224,6 +223,30 @@ namespace ITI.HerosGymManagementSystemConsoleApp
             }
 
             return true;
+        }
+        public static bool ProgramIdExists(SqlConnection connection, int ProgramID)
+        {
+            string sqlQuery = $"SELECT COUNT(*) FROM Programs WHERE Id = {ProgramID}";
+            SqlCommand command = new SqlCommand(sqlQuery, connection);
+            int count = (int)command.ExecuteScalar();
+            return count > 0;
+
+        }
+        public static bool CoachIdExists(SqlConnection connection, int coachId)
+        {
+            string sqlQuery = $"SELECT COUNT(*) FROM coaches WHERE Id = {coachId}";
+            SqlCommand command = new SqlCommand(sqlQuery, connection);
+            int count = (int)command.ExecuteScalar();
+            return count > 0;
+
+        }
+        public static bool CoachNameExists(SqlConnection connection, string name)
+        {
+            string sqlQuery = $"SELECT COUNT(*) FROM coaches WHERE Name = '{name}'";
+            SqlCommand command = new SqlCommand(sqlQuery, connection);
+            int count = (int)command.ExecuteScalar();
+            return count > 0;
+
         }
     }
 }
