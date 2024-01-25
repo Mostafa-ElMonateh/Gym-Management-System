@@ -45,7 +45,6 @@ namespace ITI.HerosGymManagementSystemConsoleApp
         #endregion
 
         #region Methods
-
         public static void ExcutingMemberShipModelOptions(SqlConnection connection, int UserId)
         {
 
@@ -161,7 +160,12 @@ namespace ITI.HerosGymManagementSystemConsoleApp
             }
 
             // Asking For the new Name..
-            CheckForMemberShipName(connection);
+            if (CheckForMemberShipName(connection) == false)
+            {
+                Helper.GetUserTravelOnApp(connection, UserId);
+            }
+
+            string NewName = name;
 
             do
             {
@@ -178,7 +182,7 @@ namespace ITI.HerosGymManagementSystemConsoleApp
             period = Holder;
 
 
-            SqlCommand command = new SqlCommand($"update Memberships\r\nset Name = '{name}', Amount = {amount}, Period = {period}\r\nwhere Name = '{OldMemberShip.Name}'", connection);
+            SqlCommand command = new SqlCommand($"update Memberships\r\nset Name = '{NewName}', Amount = {amount}, Period = {period}\r\nwhere Name = '{OldMemberShip.Name}'", connection);
 
             int rowsAffected = command.ExecuteNonQuery();
 
@@ -204,8 +208,6 @@ namespace ITI.HerosGymManagementSystemConsoleApp
             int MembersInMembershipCount;
 
             Console.Clear();
-
-            Console.WriteLine("Choose a membership to delete..");
 
             GetAllMemberShips(connection, UserId);
 
@@ -304,7 +306,7 @@ namespace ITI.HerosGymManagementSystemConsoleApp
             }
             return null;
         }
-        public static void CheckForMemberShipName(SqlConnection connection)
+        public static bool CheckForMemberShipName(SqlConnection connection)
         {
             bool NameFlag = false;
             string? NewName;
@@ -322,21 +324,38 @@ namespace ITI.HerosGymManagementSystemConsoleApp
                             if (NewName.ToLower() == name.ToLower())
                             {
                                 name = NewName;
-                                return;
+                                return true;
                             }
                             else if (NewName.ToLower() == reader[0].ToString().ToLower())
                             {
                                 NameFlag = true;
                                 Console.WriteLine("There is already a membership with this name!!");
+                                return false;
                             }
                             else
                                 NameFlag = false;
                         }
                     }
+                    name = NewName;
+                    return true;
                 }
             } while (name is null | name == "" | NameFlag == true);
         }
+        public static void ReturnAllMembershipSNotCompleted(SqlConnection connection, int UserId)
+        {
+            string query = "select * from MembershipCountsView";
 
+            DataTable dataTable = new DataTable();
+
+            using (SqlDataAdapter adapter = new SqlDataAdapter(query, connection))
+            {
+                adapter.Fill(dataTable);
+            }
+
+            Helper.PrintDataTable(dataTable);
+
+            Console.WriteLine("_____________________________");
+        }
 
         #endregion
 

@@ -19,12 +19,13 @@ namespace ITI.HerosGymManagementSystemConsoleApp
         public TimeSpan? Time { get; set; }
         public int? User_Id { get; set; }
         public int? Member_Id { get; set; }
-      
+
         SqlConnection connection;
         int UserId;
         #endregion
+
         #region Methods
-        public Payment(SqlConnection _connection,int _UserId)
+        public Payment(SqlConnection _connection, int _UserId)
         {
             connection = _connection;
             UserId = _UserId;
@@ -47,7 +48,7 @@ namespace ITI.HerosGymManagementSystemConsoleApp
                         break;
                     case "2":
                         GetAllPaymentsByMemberId();
-                        break;                
+                        break;
                     case "3":
                         Helper.GetUserTravelOnApp(connection, UserId);
                         break;
@@ -65,13 +66,13 @@ namespace ITI.HerosGymManagementSystemConsoleApp
                                "VALUES (@Amount, @Date, @Time, @User_Id, @Member_Id)";
 
                 SqlCommand command = new SqlCommand(query, connection);
-             
+
                 command.Parameters.AddWithValue("@Amount", newPayment.Amount);
                 command.Parameters.AddWithValue("@Date", newPayment.Date);
                 command.Parameters.AddWithValue("@Time", newPayment.Time);
                 command.Parameters.AddWithValue("@User_Id", newPayment.User_Id);
                 command.Parameters.AddWithValue("@Member_Id", newPayment.Member_Id);
-              
+
 
                 int res = command.ExecuteNonQuery();
 
@@ -82,16 +83,16 @@ namespace ITI.HerosGymManagementSystemConsoleApp
                 }
                 else
                     Console.WriteLine("Payment not created created ");
-            }catch(Exception e)
+            }
+            catch (Exception e)
             {
                 Console.WriteLine($"Error: {e.Message}");
             }
-         
+
         }
 
         public void PrintDetails(Payment newPayment)
         {
-            Console.WriteLine($"Payment ID: {newPayment.Id}");
             Console.WriteLine($"Amount: {newPayment.Amount}");
             Console.WriteLine($"Date: {newPayment.Date}");
             Console.WriteLine($"Time: {newPayment.Time}");
@@ -128,7 +129,7 @@ namespace ITI.HerosGymManagementSystemConsoleApp
             Console.WriteLine();
 
             string selectQuery = $"SELECT * FROM Payments where Member_Id = @Member_Id";
-          
+
             SqlCommand cmd = new SqlCommand(selectQuery, connection);
 
             cmd.Parameters.AddWithValue("@Member_Id", MemberId);

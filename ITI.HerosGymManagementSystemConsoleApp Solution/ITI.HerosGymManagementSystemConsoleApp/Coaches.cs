@@ -4,14 +4,19 @@ namespace ITI.HerosGymManagementSystemConsoleApp
 {
     class Coaches
     {
+        #region Fields
         private readonly SqlConnection connection;
-        int UserId;
+        int UserId; 
+        #endregion
 
+        #region Methods
+        #region CTORs
         public Coaches(SqlConnection connection, int _UserId)
         {
             this.connection = connection;
             UserId = _UserId;
-        }
+        } 
+        #endregion
         public void ShowUserMenu()
         {
             while (true)
@@ -21,7 +26,8 @@ namespace ITI.HerosGymManagementSystemConsoleApp
                 Console.WriteLine("2. Search Coach");
                 Console.WriteLine("3. Update Coach");
                 Console.WriteLine("4. Delete Coach");
-                Console.WriteLine("5. Return");
+                Console.WriteLine("5. Get All Coachs");
+                Console.WriteLine("6. Return");
                 Console.Write("Enter the number of your choice: ");
                 string? choice = Console.ReadLine();
                 Console.Clear();
@@ -40,6 +46,9 @@ namespace ITI.HerosGymManagementSystemConsoleApp
                         DeleteCoach();
                         break;
                     case "5":
+                        GetAll();
+                        break;
+                    case "6":
                         Helper.GetUserTravelOnApp(connection, UserId);
                         break;
                     default:
@@ -48,8 +57,6 @@ namespace ITI.HerosGymManagementSystemConsoleApp
                 }
             }
         }
-
-
         public void VaildUserInput(int Flag)
         {
             /* Ask coach for his data 
@@ -61,24 +68,24 @@ namespace ITI.HerosGymManagementSystemConsoleApp
             if (Flag == 2)
             {
 
-                Console.Write("Enter Coach ID to Update its data: ");
+                Console.Write("Enter Coach ID: ");
                 while (!int.TryParse(Console.ReadLine(), out coachId))
                 {
-                    Console.WriteLine("Invalid Coach ID. Please enter a valid integer.");
+                    Console.WriteLine("Invalid Coach ID. Enter a valid integer.");
 
                 }
 
             }
             while (true)
             {
-                Console.Write("Enter Coach Name  correct to move to next step: ");
+                Console.Write("Enter Coach Name: ");
                 name = Console.ReadLine();
                 if (Helper.IsValidName(name)) break;
 
             }
             while (true)
             {
-                Console.Write("Enter Coach Email correct to move to next step: ");
+                Console.Write("Enter Coach Email: ");
                 email = Console.ReadLine();
                 if (Helper.IsValidEmail(email)) break;
             }
@@ -87,21 +94,21 @@ namespace ITI.HerosGymManagementSystemConsoleApp
 
             while (!int.TryParse(Console.ReadLine(), out programId))
             {
-                Console.WriteLine("Invalid Program ID. Please enter a valid integer.");
+                Console.WriteLine("Invalid Program ID. Enter a valid integer.");
 
             }
 
             Console.Write("Enter User ID: ");
             while (!int.TryParse(Console.ReadLine(), out userId))
             {
-                Console.WriteLine("Invalid User ID. Please enter a valid integer.");
+                Console.WriteLine("Invalid User ID. Enter a valid integer.");
 
             }
 
             Console.Write("Enter Coach Phone: ");
             while (!int.TryParse(Console.ReadLine(), out phone))
             {
-                Console.WriteLine("Invalid Phone number. Please enter a valid integer.");
+                Console.WriteLine("Invalid Phone number. Enter a valid integer.");
 
             }
 
@@ -122,13 +129,13 @@ namespace ITI.HerosGymManagementSystemConsoleApp
         public void AddCoach(string name, string email, int programId, int userId, int phone, string address)
         {
 
-            
+
             try
             {
 
 
                 // Insert into Coaches table
-                string insertCoachQuery = "INSERT INTO Coaches (Name, Email, Program_Id, User_Id, IsDeleted) VALUES (@Name, @Email, @ProgramId, @UserId, 't'); SELECT SCOPE_IDENTITY();";
+                string insertCoachQuery = "INSERT INTO Coaches (Name, Email, Program_Id, User_Id, IsDeleted) VALUES (@Name, @Email, @ProgramId, @UserId, 'f'); SELECT SCOPE_IDENTITY();";
                 SqlCommand cmd = new SqlCommand(insertCoachQuery, connection);
                 cmd.Parameters.AddWithValue("@Name", name);
                 cmd.Parameters.AddWithValue("@Email", email);
@@ -162,10 +169,9 @@ namespace ITI.HerosGymManagementSystemConsoleApp
             {
                 Console.WriteLine($"Enter vaild id ");
             }
-            Console.Clear();
+            
             ShowUserMenu();
         }
-
         public void DeleteCoach()
         {
             // Update IsDeleted in Coaches table
@@ -198,7 +204,19 @@ namespace ITI.HerosGymManagementSystemConsoleApp
 
 
         }
+        public void GetAll()
+        {
+            string sqlQuery = $"select * from GetAllCoachesData";
 
+            DataTable dataTable = new DataTable();
+
+            using (SqlDataAdapter adapter = new SqlDataAdapter(sqlQuery, connection))
+            {
+                adapter.Fill(dataTable);
+            }
+
+            Helper.PrintDataTable(dataTable);
+        }
         public void SearchCoach()
         {
             Console.Clear();
@@ -207,15 +225,15 @@ namespace ITI.HerosGymManagementSystemConsoleApp
             Console.Write("Enter Coach ID: ");
             while (!int.TryParse(Console.ReadLine(), out coachId))
             {
-                Console.WriteLine("Invalid Coach ID. Please enter a valid integer.");
+                Console.WriteLine("Invalid Coach ID. Enter a valid integer.");
             }
             try
             {
                 string selectQuery = "SELECT C.*, CP.Phone, CA.Address " +
                                      "FROM Coaches C " +
-                                     "JOIN Coach_Phones CP ON C.Id = CP.Id " +
-                                     "JOIN Coach_Addresses CA ON C.Id = CA.Id " +
-                                     "WHERE C.Id = @CoachId AND C.IsDeleted = 't';";
+                                     "LEFT JOIN Coach_Phones CP ON C.Id = CP.Id " +
+                                     "LEFT JOIN Coach_Addresses CA ON C.Id = CA.Id " +
+                                     "WHERE C.Id = @CoachId AND C.IsDeleted = 'f';";
 
                 SqlCommand cmd = new SqlCommand(selectQuery, connection);
 
@@ -227,9 +245,9 @@ namespace ITI.HerosGymManagementSystemConsoleApp
                 adapter.Fill(resultTable);
                 if (resultTable.Rows.Count > 0)
                 {
-                    Console.WriteLine($"\n Coach found... \n Name: {resultTable.Rows[0]["Name"]}\t" +
-                        $" Email: {resultTable.Rows[0]["Email"]}\t Phone: {resultTable.Rows[0]["Phone"]}\t" +
-                        $" Address: {resultTable.Rows[0]["Address"]}\n");
+                    Console.WriteLine($"\nCoach found... \nName: {resultTable.Rows[0]["Name"]}\n" +
+                        $"Email: {resultTable.Rows[0]["Email"]}\nPhone: {resultTable.Rows[0]["Phone"]}\n" +
+                        $"Address: {resultTable.Rows[0]["Address"]}\n");
                 }
                 else
                 {
@@ -246,7 +264,6 @@ namespace ITI.HerosGymManagementSystemConsoleApp
 
 
         }
-
         public void UpdateCoach(int coachId, string newName, string newEmail, int newProgramId, int newUserId, int newPhone, string newAddress)
         {
             // Update coaches data by know its id  
@@ -255,7 +272,7 @@ namespace ITI.HerosGymManagementSystemConsoleApp
 
 
                 string updateQuery = "UPDATE Coaches SET Name = @NewName, Email = @NewEmail, Program_Id = @NewProgramId, User_Id = @NewUserId " +
-                                     "WHERE Id = @CoachId AND IsDeleted = 't';" +
+                                     "WHERE Id = @CoachId AND IsDeleted = 'f';" +
                                      "UPDATE Coach_Phones SET Phone = @NewPhone WHERE Id = @CoachId;" +
                                      "UPDATE Coach_Addresses SET Address = @NewAddress WHERE Id = @CoachId;";
                 SqlCommand cmd = new SqlCommand(updateQuery, connection);
@@ -279,6 +296,7 @@ namespace ITI.HerosGymManagementSystemConsoleApp
             ShowUserMenu();
 
 
-        }
+        } 
+        #endregion
     }
 }

@@ -56,14 +56,20 @@ namespace ITI.HerosGymManagementSystemConsoleApp
         public static void GetUserTravelOnApp(SqlConnection connection, int UserId)
         {
             int option;
-            Console.WriteLine("[1] Members\n[2] Coaches\n[3] Memberships\n[4] Programs\n[5] Payments\n[6] Users\n[7] Exist..");
+            bool Flag;
+            string Msg = "[1] Members\n[2] Coaches\n[3] Memberships\n[4] Programs\n[5] Payments\n[6] Users\n[7] Exist..";
+            Console.WriteLine(Msg);
 
             do
             {
                 Console.WriteLine("Choose One Option:");
-            } while (!int.TryParse(Console.ReadLine(), out option));
+                Flag = int.TryParse(Console.ReadLine(), out option);
+                Console.Clear();
+                if (!Flag)
+                    Console.WriteLine(Msg);
+            } while (!Flag);
 
-            Console.Clear();
+            
 
             switch (option)
             {
@@ -98,7 +104,7 @@ namespace ITI.HerosGymManagementSystemConsoleApp
                     Environment.Exit(0);
                     break;
                 default:
-                    Console.WriteLine("Enter a valid option!!");
+                    Console.Clear();
                     GetUserTravelOnApp(connection, UserId);
                     break;
 
@@ -179,8 +185,6 @@ namespace ITI.HerosGymManagementSystemConsoleApp
             SqlCommand command = new SqlCommand($"select Name from Users where Id = {UserId}", connection);
             return command.ExecuteScalar().ToString();
         }
-
-
         public static bool IsValidPhoneNumber(string phoneNumber)
         {
             // Validate the phone number format based on your specific requirements
@@ -201,6 +205,23 @@ namespace ITI.HerosGymManagementSystemConsoleApp
 
             // Add more conditions as needed
             // For example, you can check if it has a specific length
+
+            return true;
+        }
+        public static bool ValidateDates(DateTime startDate, DateTime endDate)
+        {
+
+            if (endDate <= startDate)
+            {
+                Console.WriteLine("End date must be later than the start date.");
+                return false;
+            }
+
+            if ((endDate - startDate).TotalDays <= 30)
+            {
+                Console.WriteLine("The difference between start date and end date must be more than one month.");
+                return false;
+            }
 
             return true;
         }

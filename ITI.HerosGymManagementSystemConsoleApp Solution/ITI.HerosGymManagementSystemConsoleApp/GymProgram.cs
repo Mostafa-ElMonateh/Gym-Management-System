@@ -76,7 +76,7 @@ namespace ITI.HerosGymManagementSystemConsoleApp
             } while (Holder <= 0 | !Flag);
             salary = Holder;
 
-            SqlCommand command = new SqlCommand($"insert into Programs(Name,Description,Salary) values('{name}','{description}',{salary})", connection);
+            SqlCommand command = new SqlCommand($"insert into Programs(Name,Description,Salary,UserId) values('{name}','{description}',{salary},{UserId})", connection);
 
 
             int rowsAffected = command.ExecuteNonQuery();
@@ -205,7 +205,7 @@ namespace ITI.HerosGymManagementSystemConsoleApp
 
             if (ProgramsInProgramCount > 0)
             {
-                Console.WriteLine("This membership has already members..\n");
+                Console.WriteLine("This program has already members..\n");
                 ExcutingProgramModelOptions(connection, UserId);
                 return;
             }

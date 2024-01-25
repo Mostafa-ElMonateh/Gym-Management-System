@@ -6,6 +6,7 @@ namespace ITI.HerosGymManagementSystemConsoleApp
 
         SqlConnection connection;
         int UserId;
+
         #region methods
         public Members(SqlConnection _connection, int _UserId)
         {
@@ -35,13 +36,13 @@ namespace ITI.HerosGymManagementSystemConsoleApp
                 Console.WriteLine("3. Update Member");
                 Console.WriteLine("4. Add New Member Program");
                 Console.WriteLine("5. Return..");
-                Console.Write("Enter the number of your choice: ");
+                Console.Write("Enter your choice: ");
                 string? choice = Console.ReadLine();
 
                 switch (choice)
                 {
                     case "1":
-                         InsertMemberFromUserInput(1);                  
+                        InsertMemberFromUserInput(1);
                         break;
                     case "2":
                         SearchMember();
@@ -57,48 +58,51 @@ namespace ITI.HerosGymManagementSystemConsoleApp
                         Helper.GetUserTravelOnApp(connection, UserId);
                         break;
                     default:
-                        Console.WriteLine("Invalid choice. Please enter a number between 1 and 5.");
+                        Console.WriteLine("Invalid choice!!");
+                        Console.Clear();
                         break;
                 }
             }
         }
         public void SearchMember()
         {
-            Console.WriteLine("Enter the  vaild phone number to confirm whether the member exists or not  ");
+            Console.Clear();
+            Console.WriteLine("Enter the phone number:");
             string? phone = Console.ReadLine();
             while (!Helper.IsValidPhoneNumber(phone))
             {
-                Console.WriteLine("Enter the  vaild phone number to confirm whether the member exists or not  ");
+                Console.WriteLine("Enter the vaild phone number !");
                 phone = Console.ReadLine();
             }
             if (IsMemberExistsByPhoneNumber(phone))
             {
-                Console.WriteLine("this member is exists ");
-                
+                Console.WriteLine("this member is exists !!");
             }
             else
             {
                 Console.WriteLine("this member is not exists ");
             }
+            
         }
         public void InsertMemberFromUserInput(int Flag)
         {
-            Console.WriteLine("Enter the  vaild phone number to confirm whether the member exists or not  ");
+            Console.Clear();
+            Console.WriteLine("Enter the phone number:");
             string? phone = Console.ReadLine();
             while (!Helper.IsValidPhoneNumber(phone))
             {
-                Console.WriteLine("Enter the  vaild phone number to confirm whether the member exists or not  ");
+                Console.WriteLine("Enter the valid phone number:");
                 phone = Console.ReadLine();
             }
             bool IsMemberFound = IsMemberExistsByPhoneNumber(phone);
-            if (IsMemberFound && Flag==1)
+            if (IsMemberFound && Flag == 1)
             {
-                Console.WriteLine("this member is exists before");
+                Console.WriteLine("this member is exists before!!");
                 return;
             }
             if (!IsMemberFound && Flag == 2)
             {
-                Console.WriteLine("this member is  not exists before");
+                Console.WriteLine("this member is not exists before");
                 return;
             }
             string? name;
@@ -107,66 +111,73 @@ namespace ITI.HerosGymManagementSystemConsoleApp
 
             while (true)
             {
-                Console.Write("Enter Member Name correct to move to next step: ");
+                Console.Write("Enter Member Name: ");
                 name = Console.ReadLine();
                 if (Helper.IsValidName(name)) break;
 
             }
             while (true)
             {
-                Console.Write("Enter Member Email correct to move to next step: ");
+                Console.Write("Enter Member Email: ");
                 email = Console.ReadLine();
                 if (Helper.IsValidEmail(email)) break;
             }
 
-            Console.Write("Age: ");
+            Console.Write("Enter Member Age: ");
             int age;
             while (!int.TryParse(Console.ReadLine(), out age) || age <= 0)
             {
-                Console.WriteLine("Invalid age. Please enter a valid positive integer.");
+                Console.WriteLine("Invalid age!! Enter a valid age..");
             }
 
             Console.Write("Gender (M/F): ");
             char gender;
-            while (!char.TryParse(Console.ReadLine(), out gender) || (gender != 'M' && gender != 'F'))
+            while (!char.TryParse(Console.ReadLine(), out gender) || (char.ToLower(gender) != 'm' && char.ToLower(gender) != 'f'))
             {
-                Console.WriteLine("Invalid gender. Please enter 'M' for Male or 'F' for Female.");
+                Console.WriteLine("Invalid gender!!");
             }
-            MemberShip.GetAllMemberShips(connection, UserId);
-            Console.Write("Enter your Membership Id: ");
+            MemberShip.ReturnAllMembershipSNotCompleted(connection, UserId);
+            Console.Write("Enter The Membership Id: ");
             int membershipId;
             while (!int.TryParse(Console.ReadLine(), out membershipId) || membershipId <= 0)
             {
-                Console.WriteLine("Invalid Membership Id. Please enter a valid positive integer.");
+                Console.WriteLine("Invalid Membership Id!! Please enter a valid one..");
             }
+
             GymProgram.GetAllPrograms(connection, UserId);
             int programId;
-            Console.Write("Enter your programId Id: ");
+            Console.Write("Enter The Program Id: ");
             while (!int.TryParse(Console.ReadLine(), out programId) || programId <= 0)
             {
-                Console.WriteLine("Invalid programId Id. Please enter a valid positive integer.");
+                Console.WriteLine("Invalid Program Id!! Please enter a valid one..");
             }
-            DateTime startDate;
-            Console.Write("Enter  start Date (yyyy-MM-dd): ");
-            while (!DateTime.TryParseExact(Console.ReadLine(), "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out startDate))
+            DateTime startDate; DateTime endDate;
+            while (true)
             {
-                Console.WriteLine("Invalid input. Please enter a valid date in the format yyyy-MM-dd.");
                 Console.Write("Enter  start Date (yyyy-MM-dd): ");
+                while (!DateTime.TryParseExact(Console.ReadLine(), "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out startDate))
+                {
+                    Console.WriteLine("Invalid input. Enter a valid date in the format yyyy-MM-dd.");
+                    Console.Write("Enter start Date (yyyy-MM-dd): ");
+                }
+
+                Console.Write("Enter end Date (yyyy-MM-dd): ");
+                while (!DateTime.TryParseExact(Console.ReadLine(), "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out endDate))
+                {
+                    Console.WriteLine("Invalid input. Enter a valid date in the format yyyy-MM-dd.");
+                    Console.Write("Enter end Date (yyyy-MM-dd): ");
+                }
+                if (Helper.ValidateDates(startDate, endDate))
+                    break;
             }
-            DateTime endDate;
-            Console.Write("Enter  end Date (yyyy-MM-dd): ");
-            while (!DateTime.TryParseExact(Console.ReadLine(), "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out endDate))
-            {
-                Console.WriteLine("Invalid input. Please enter a valid date in the format yyyy-MM-dd.");
-                Console.Write("Enter  end Date (yyyy-MM-dd): ");
-            }
-            InsertMember(name, email, age, gender, UserId, membershipId, programId, phone, startDate, endDate);
+            InsertMember(name, email, age, gender, UserId, membershipId, programId, phone, startDate, endDate, Flag);
         }
-        public void InsertMember(string name, string email, int age, char gender, int userId, int membershipId, int programId, string phone, DateTime startDate, DateTime endDate)
+        public void InsertMember(string name, string email, int age, char gender, int userId, int membershipId, int programId, string phone, DateTime startDate, DateTime endDate, int flag)
         {
+            
             try
             {
-                string insertQuery = "INSERT INTO Members (Name, Email, Age, Gender, User_Id, Id) " +
+                string insertQuery = "INSERT INTO Members (Name, Email, Age, Gender, User_Id, Membership_Id) " +
                                      "VALUES (@Name, @Email, @Age, @Gender, @User_Id, @Membership_Id); " +
                                      "SELECT SCOPE_IDENTITY();";
 
@@ -181,20 +192,27 @@ namespace ITI.HerosGymManagementSystemConsoleApp
 
                 int memberId = Convert.ToInt32(cmd.ExecuteScalar());
 
-      
-               int res1= InsertIntoMemberPhones(memberId, phone);
-               int res2= InsertIntoMemberPrograms(memberId, programId, startDate, endDate);
-               
-                if (res1>0&&res2>0)
+
+                int res1 = InsertIntoMemberPhones(memberId, phone);
+                int res2 = InsertIntoMemberPrograms(memberId, programId, startDate, endDate);
+
+                if (flag == 1)
                 {
-                    Console.WriteLine("Member added successfully");
-                    CalcPayment(startDate, endDate, programId, memberId);
+                    if (res1 > 0 && res2 > 0)
+                    {
+                        Console.WriteLine("Member added successfully");
+                        CalcPayment(startDate, endDate, programId, memberId);
 
-
+                    }
+                    else
+                        Console.WriteLine("Member not  added ");
                 }
                 else
                 {
-                    Console.WriteLine("Member not  added ");
+                    if (res1 > 0 && res2 > 0)
+                        Console.WriteLine("Member updated successfully");
+                    else
+                        Console.WriteLine("Member not updated ");
                 }
             }
             catch (Exception e)
@@ -206,23 +224,23 @@ namespace ITI.HerosGymManagementSystemConsoleApp
         }
         public int InsertIntoMemberPhones(int memberId, string phone)
         {
-            string insertQuery = "INSERT INTO Member_Phones (Member_Id, Phone) VALUES (@Member_Id, @Phone);";
+            string insertQuery = "INSERT INTO Member_Phones (Id, Phone) VALUES (@Member_Id, @Phone);";
 
             using (SqlCommand cmd = new SqlCommand(insertQuery, connection))
             {
                 cmd.Parameters.AddWithValue("@Member_Id", memberId);
                 cmd.Parameters.AddWithValue("@Phone", phone);
 
-               return cmd.ExecuteNonQuery();
+                return cmd.ExecuteNonQuery();
             }
 
         }
-        public void CalcPayment(DateTime startDate, DateTime endDate, int programId,int memberId)
+        public void CalcPayment(DateTime startDate, DateTime endDate, int programId, int memberId)
         {
-          
+
             int numberOfMonths = ((endDate.Year - startDate.Year) * 12) + endDate.Month - startDate.Month;
 
-         
+
             string query = "SELECT Salary FROM Programs WHERE Id = @ProgramId";
             decimal salary = 0;
             using (SqlCommand command = new SqlCommand(query, connection))
@@ -245,34 +263,35 @@ namespace ITI.HerosGymManagementSystemConsoleApp
         }
         public void UserInputsForProgram()
         {
+            Console.Clear();
             int memberId;
-            Console.Write("Enter your member Id: ");
+            Console.Write("Enter The Member Id: ");
             while (!int.TryParse(Console.ReadLine(), out memberId) || memberId <= 0)
             {
-                Console.WriteLine("Invalid memberId Id. Please enter a valid positive integer.");
+                Console.WriteLine("Invalid Member Id!!");
             }
             int programId;
-            Console.Write("Enter your programId Id: ");
+            Console.Write("Enter The Program Id: ");
             while (!int.TryParse(Console.ReadLine(), out programId) || programId <= 0)
             {
-                Console.WriteLine("Invalid programId Id. Please enter a valid positive integer.");
+                Console.WriteLine("Invalid Program Id!!");
             }
             DateTime startDate;
-            Console.Write("Enter  start Date (yyyy-MM-dd): ");
+            Console.Write("Enter start Date (yyyy-MM-dd): ");
             while (!DateTime.TryParseExact(Console.ReadLine(), "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out startDate))
             {
-                Console.WriteLine("Invalid input. Please enter a valid date in the format yyyy-MM-dd.");
-                Console.Write("Enter  start Date (yyyy-MM-dd): ");
+                Console.WriteLine("Invalid input!! Please enter a valid date in the format yyyy-MM-dd.");
+                Console.Write("Enter start Date (yyyy-MM-dd): ");
             }
             DateTime endDate;
-            Console.Write("Enter  end Date (yyyy-MM-dd): ");
+            Console.Write("Enter end Date (yyyy-MM-dd): ");
             while (!DateTime.TryParseExact(Console.ReadLine(), "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out endDate))
             {
-                Console.WriteLine("Invalid input. Please enter a valid date in the format yyyy-MM-dd.");
-                Console.Write("Enter  end Date (yyyy-MM-dd): ");
+                Console.WriteLine("Invalid input!! Please enter a valid date in the format yyyy-MM-dd.");
+                Console.Write("Enter end Date (yyyy-MM-dd): ");
             }
-           int res= InsertIntoMemberPrograms(memberId,programId, startDate, endDate);
-            if (res>0)
+            int res = InsertIntoMemberPrograms(memberId, programId, startDate, endDate);
+            if (res > 0)
             {
                 Console.WriteLine("The program added successfully");
             }
@@ -298,7 +317,8 @@ namespace ITI.HerosGymManagementSystemConsoleApp
 
                     return cmd.ExecuteNonQuery();
                 }
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 Console.WriteLine("Enter vaild id ");
                 return -1;
